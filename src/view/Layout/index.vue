@@ -1,6 +1,6 @@
 <script setup>
-import {ref,watch} from 'vue'
-import {useRoute} from 'vue-router'
+import {ref,watch,onMounted} from 'vue'
+import {useRoute,useRouter} from 'vue-router'
 
 //控制菜单折叠
 const isFold = ref(false)
@@ -21,7 +21,11 @@ const getBreadcrumbData = () => {
             // console.log('当前路径',matchName);
             breadcrumbData.value.push(matchName)
         }
+    } else {
+        breadcrumbData.value.push('/login')
+
     }
+
 }
 watch(
     route,
@@ -34,12 +38,21 @@ watch(
     }
 )
 
-//菜单点击事件
-const handleClick = (e) => {
-    console.log("菜单被点击了",e);
-}
-const handleSelect = (key, keyPath) => {
-  console.log(key,"@@@", keyPath)
+const router = useRouter()
+//登录
+// const login = () => {
+    
+//     console.log(route);
+// }
+//退出登录
+const isLogin = ref(false)
+onMounted(() => {
+    if(localStorage.getItem('token')) isLogin.value = true 
+})
+
+const confirm = () => {
+    localStorage.removeItem('token')
+    router.replace('/login')
 }
 
 
@@ -68,7 +81,12 @@ const handleSelect = (key, keyPath) => {
                 <template #dropdown>
                 <el-dropdown-menu>
                     <el-dropdown-item>个人中心</el-dropdown-item>
-                    <el-dropdown-item>退出登录</el-dropdown-item>
+                    <el-popconfirm @confirm="confirm" title="确认退出吗?" confirm-button-text="确认" cancel-button-text="取消">
+                        <template #reference>
+                            <a class="logoutLink" href="javascript:;"><el-dropdown-item v-if="isLogin">退出登录</el-dropdown-item></a>
+                        </template>
+                    </el-popconfirm>
+                    <el-dropdown-item v-if="!isLogin" @click="$router.push('/login')">去登录</el-dropdown-item>
                 </el-dropdown-menu>
                 </template>
             </el-dropdown>
@@ -92,7 +110,7 @@ const handleSelect = (key, keyPath) => {
                     <el-icon><User /></el-icon>
                     <template #title>用户</template>
                 </el-menu-item>
-                <el-menu-item index="/userManage">
+                <el-menu-item index="/role">
                     <el-icon><UserFilled /></el-icon>
                     <template #title>角色管理</template>
                 </el-menu-item>
@@ -151,6 +169,9 @@ const handleSelect = (key, keyPath) => {
             }
             .el-avatar {
                 margin: 0 20px;
+            }
+            .logoutLink {
+                text-decoration: none;
             }
         }
     }

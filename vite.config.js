@@ -22,5 +22,14 @@ export default defineConfig({
 
     }
   },
-  
+  // 配置跨域
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://175.178.78.181:8848',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
+  }
 })

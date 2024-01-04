@@ -21,15 +21,19 @@ const router  = createRouter({
                     component:() => import('@/view/User/index.vue')
                 },
                 {
-                    path: '/userManage',
+                    path: '/role',
                     name: '角色管理',
-                    component: () => import('@/view/UserManage/index.vue')
+                    component: () => import('@/view/Role/index.vue')
                 }
             ]
         },
         {
             path: '/error',
             component: () => import('@/components/ERROR.vue')
+        },
+        {
+            path: '/login',
+            component: () => import('@/view/Login/index.vue')
         }
     ]
 })
