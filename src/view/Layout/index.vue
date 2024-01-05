@@ -114,7 +114,7 @@ const confirm = () => {
                     <el-icon><UserFilled /></el-icon>
                     <template #title>角色管理</template>
                 </el-menu-item>
-                <!-- 一下导航后期再维护 -->
+                <!-- 下拉导航后期再维护 -->
                 <el-sub-menu index="/error"> 
                     <template #title>
                         <el-icon><location /></el-icon>

@@ -7,14 +7,13 @@ const httpInstance = axios.create({
     timeout: 5000
   })
 
-
 // 添加请求拦截器
 httpInstance.interceptors.request.use(function (config) {
 
   const hasToken = localStorage.getItem('token')
   //按照后端要求拼接token数据
   if(hasToken) {
-    config.headers.Authorization = `Bearer ${hasToken}` 
+    config.headers.token = `${hasToken}` 
     //记得Bearer后面有个空格，这一行在请求头中携带了token，格式较为固定
   }
   return config;

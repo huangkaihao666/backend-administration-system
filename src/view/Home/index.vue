@@ -14,7 +14,8 @@ import menberOfEcharts from '@/components/menberOfEcharts.vue';
 <style scoped>
 .container {    
     width: 250px;
-    position: absolute;    margin: 0 auto;
+    position: absolute;    
+    margin: 0 auto;
     top: 13%;
     left: 40%;
 }

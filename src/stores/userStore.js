@@ -2,6 +2,7 @@ import {defineStore} from 'pinia'
 import {getLoginAPI,getLoginTokenAPI} from '@/apis/login.js'
 import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
+import { getUserInfoAPI } from '@/apis/user' 
 
 export const useUserStore = defineStore('user', () => {
 
@@ -32,6 +33,22 @@ export const useUserStore = defineStore('user', () => {
     return {
         userInfo,
         getUserInfo
+    }
+})
+
+export const useUserInfoStore = defineStore('userMsg', () => {
+
+    //定义管理用户信息的state
+    const userMsg = ref({})
+
+    const getUserMsg = async ({pageNum,pageSize}) => {
+        const res = await getUserInfoAPI({pageNum,pageSize})
+        console.log(res);
+        userMsg.value = res
+    }
+    return {
+        userMsg,
+        getUserMsg
     }
 })
 
