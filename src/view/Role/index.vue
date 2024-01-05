@@ -1,22 +1,19 @@
 <script setup>
-import {getRoleAPI} from '@/apis/role'
+import { getRoleAPI } from '@/apis/role'
 import { onMounted } from 'vue'
 
 const getRole = async () => {
-    const res = await getRoleAPI()
-    console.log('roleList',res)
+	const res = await getRoleAPI()
+	console.log('roleList', res)
 }
 
 onMounted(() => {
-    getRole()
+	getRole()
 })
-
 </script>
 
 <template>
-<div> This is Role</div>
+	<div>This is Role</div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
