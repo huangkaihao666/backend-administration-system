@@ -14,7 +14,7 @@ import { createPinia } from 'pinia'
 
 const app = createApp(App)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-	app.component(key, component)
+  app.component(key, component)
 }
 
 app.use(router)
