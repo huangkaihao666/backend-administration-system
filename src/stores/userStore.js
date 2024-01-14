@@ -41,7 +41,7 @@ export const useUserInfoStore = defineStore('userMsg', () => {
 
   const getUserMsg = async ({ pageNum, pageSize }) => {
     const res = await getUserInfoAPI({ pageNum, pageSize })
-    console.log(res)
+    // console.log(res)
     userMsg.value = res
   }
   return {
