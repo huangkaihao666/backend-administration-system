@@ -211,9 +211,7 @@ const handleRoleOPtion = (val) => {
 const confirmAddUser = async () => {
   formInline.value.gender = formInline.value.gender === '男' ? 1 : 0
   formInline.value.status = formInline.value.status === '正常' ? 1 : 0
-  console.log('提交的表单数据', formInline.value)
-  const res = await addUserInfoAPI(formInline.value)
-  console.log('add', res)
+  await addUserInfoAPI(formInline.value)
 
   //清空表单填入的数据
   formInline.value = {}
@@ -236,6 +234,7 @@ const handledetail = (row) => {
   formInline.value.password = row.password
   formInline.value.gender = row.gender
   formInline.value.age = row.age
+  formInline.value.id = row.id
   formInline.value.birth = row.birth
   formInline.value.roleId = row.roleId
   formInline.value.status = row.status
@@ -262,13 +261,15 @@ const handledetail = (row) => {
 //确认修改用户信息
 const confirmEdit = async () => {
   console.log('表单信息', formInline.value)
+  formInline.value.gender = formInline.value.gender === '男' ? 1 : 0
+  formInline.value.status = formInline.value.status === '正常' ? 1 : 0
   await editUserInfoAPI(formInline.value)
   editFormVisible.value = false
   //更新视图
   const res1 = await getUserInfoAPI(0, 0)
   userMsg.value = res1.data
   currentPageUserMsg.value = userMsg.value.records.slice(0, searchForm.value.size)
-  console.log(res1)
+  console.log('editedData', res1)
 }
 
 //表单校验规则
@@ -277,6 +278,10 @@ const rules = ref({
   password: [
     { required: true, message: '密码不能为空', trigger: 'blur' },
     { min: 6, max: 14, message: '密码长度为6-14个字符', trigger: 'blur' }
+  ],
+  email: [
+    { type: 'email', message: '请输入有效的邮箱地址', trigger: ['blur', 'change'] },
+    { required: true, message: '请输入有效的邮箱地址', trigger: 'blur' }
   ]
 })
 </script>
@@ -351,7 +356,7 @@ const rules = ref({
       <el-form-item label="电话" style="margin-left: 10px">
         <el-input v-model="formInline.phone" clearable />
       </el-form-item>
-      <el-form-item label="邮箱" style="margin-left: 37px">
+      <el-form-item prop="email" label="邮箱" style="margin-left: 37px">
         <el-input v-model="formInline.email" clearable />
       </el-form-item>
       <el-form-item prop="password" label="密码">
@@ -389,17 +394,17 @@ const rules = ref({
   </el-dialog>
   <!-- 编辑用户的对话逻辑(到时候和新增封装为一个通用的Hook) -->
   <el-dialog v-model="editFormVisible" title="编辑用户信息" width="41%" destroy-on-close center>
-    <el-form :inline="true" :model="formInline" class="demo-form-inline">
-      <el-form-item label="用户名称">
+    <el-form :inline="true" :rules="rules" :model="formInline" class="demo-form-inline">
+      <el-form-item prop="account" label="用户名称">
         <el-input v-model="formInline.account" clearable />
       </el-form-item>
       <el-form-item label="电话" style="margin-right: 60px">
         <el-input v-model="formInline.phone" clearable />
       </el-form-item>
-      <el-form-item label="邮箱" style="margin-left: 30px">
+      <el-form-item prop="email" label="邮箱" style="margin-left: 30px">
         <el-input v-model="formInline.email" clearable />
       </el-form-item>
-      <el-form-item label="密码" style="margin-right: 63px">
+      <el-form-item prop="password" label="密码" style="margin-right: 63px">
         <el-input type="password" disabled v-model="formInline.password" clearable />
       </el-form-item>
       <el-form-item label="性别:" style="margin-left: 30px">
