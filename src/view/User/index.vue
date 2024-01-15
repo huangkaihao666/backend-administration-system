@@ -4,28 +4,29 @@ import { onMounted, ref } from 'vue'
 import { useRoleStore } from '@/stores/roleStore.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
+//准备好分页数据的对象
 const searchForm = ref({
   name: '',
   current: 1,
   size: 10
 })
+// 获取用户信息
+const statusList = ref([])
 const userMsg = ref({})
 const currentPageUserMsg = ref([])
 const total = ref(0)
-const statusList = ref([])
 const getUserMsg = async ({ pageNum, pageSize }) => {
   const res = await getUserInfoAPI({ pageNum, pageSize })
   userMsg.value = res.data
   currentPageUserMsg.value = userMsg.value.records.slice(0, searchForm.value.size)
   console.log('@@获取用户信息', userMsg.value)
   total.value = res.data.total
-  statusList.value = []
-  // currentPageUserMsg.value.forEach((item) => {
-  //   item.status = item.status === 1 ? 'true' : 'false'
-  // })
-  // currentPageUserMsg.push(statusList.value)
   console.log('curr', currentPageUserMsg.value)
-  // console.log(statusList.value)
+  statusList.value = []
+  userMsg.value.records.forEach((item) => {
+    statusList.value.push(item.status === 1 ? true : false)
+  })
+  console.log(statusList.value)
 }
 onMounted(() => {
   getUserMsg({
@@ -35,13 +36,10 @@ onMounted(() => {
 })
 
 //多选
-//保存要删除的用户ID
+//保存要批量删除的用户ID
 let IDs
 const handleSelectionChange = (val) => {
   IDs = ''
-  // val.forEach((item) => {
-  //   IDs.push(item.id)
-  // })
   console.log(val)
   val.forEach((item) => {
     IDs += item.id + ','
@@ -56,7 +54,7 @@ const handleDelList = async () => {
     ElMessage.error('请先勾选您想要删除的数据')
     return
   } else {
-    ElMessageBox.confirm('确认删除该用户吗?', {
+    ElMessageBox.confirm('确认删除选中的用户吗?', {
       confirmButtonText: '是',
       cancelButtonText: '否',
       type: 'warning'
@@ -68,6 +66,11 @@ const handleDelList = async () => {
         const res1 = await getUserInfoAPI(0, 0)
         userMsg.value = res1.data
         currentPageUserMsg.value = userMsg.value.records.slice(0, searchForm.value.size)
+        total.value = userMsg.value.records.length
+        ElMessage({
+          type: 'success',
+          message: '删除成功'
+        })
       })
       .catch(() => {})
   }
@@ -92,25 +95,43 @@ const handleDel = async (index, rowData) => {
       const res1 = await getUserInfoAPI(0, 0)
       userMsg.value = res1.data
       currentPageUserMsg.value = userMsg.value.records.slice(0, searchForm.value.size)
-      // ElMessage({
-      //   type: 'success',
-      //   message: '删除成功'
-      // })
+      total.value = userMsg.value.records.length
+      ElMessage({
+        type: 'success',
+        message: '删除成功'
+      })
     })
-    .catch(() => {
-      // ElMessage({
-      //   type: 'info',
-      //   message: 'Delete canceled'
-      // })
-    })
+    .catch(() => {})
 }
 
 //用户状态(todo)
-const statusval = ref(false)
+// const rowStatus = ref(false)
 
 const handleStatus = (scope) => {
-  console.log(scope.row.status)
-  // statusval.val = val.row.status === 1 ? true : false
+  console.log('111', scope)
+  console.log('scope.row.status: ', scope.row.status)
+  const changeStatus = ref('')
+  const changedUserName = ref('')
+  changedUserName.value = scope.row.account
+  if (scope.row.status === 1) {
+    changeStatus.value = '停用'
+  } else {
+    changeStatus.value = '启用'
+  }
+  ElMessageBox.confirm(`确认${changeStatus.value}${changedUserName.value}吗?`, {
+    confirmButtonText: '是',
+    cancelButtonText: '否',
+    type: 'warning'
+  })
+    .then(() => {
+      statusList[scope.$index] = scope.row.status === 1 ? false : true
+      console.log('222', statusList[scope.$index])
+
+      //后续调用相关api,修改用户的status
+    })
+    .catch(() => {
+      statusList[scope.$index] = scope.row.status === 1 ? true : false
+    })
   console.log(scope)
 }
 
@@ -119,11 +140,6 @@ const searchData = ref({
   pageNum: 0,
   pageSize: 0,
   account: ''
-  // phone: '',
-  // email: '',
-  // gender: 0,
-  // roleId: 0,
-  // status: 0
 })
 const searchUser = async (val) => {
   console.log('search', val)
@@ -134,6 +150,7 @@ const searchUser = async (val) => {
   // const res1 = await getUserInfoAPI(0, 0)
   userMsg.value = res.data
   currentPageUserMsg.value = userMsg.value.records.slice(0, searchForm.value.size)
+  total.value = userMsg.value.records.length
 }
 
 //页数变化
@@ -184,6 +201,7 @@ const addFormVisible = ref(false)
 const roleOptions = ref([])
 const handleAdd = () => {
   formInline.value = {}
+  roleOptions.value = []
   useRole.roleInfo.forEach((item) => {
     roleOptions.value.push({
       id: item.id,
@@ -221,6 +239,11 @@ const confirmAddUser = async () => {
   const res1 = await getUserInfoAPI(0, 0)
   userMsg.value = res1.data
   currentPageUserMsg.value = userMsg.value.records.slice(0, searchForm.value.size)
+  total.value = userMsg.value.records.length
+  ElMessage({
+    type: 'success',
+    message: '新增用户成功'
+  })
 }
 
 // 编辑用户信息
@@ -270,6 +293,10 @@ const confirmEdit = async () => {
   userMsg.value = res1.data
   currentPageUserMsg.value = userMsg.value.records.slice(0, searchForm.value.size)
   console.log('editedData', res1)
+  ElMessage({
+    type: 'success',
+    message: '编辑用户信息成功'
+  })
 }
 
 //表单校验规则
@@ -304,9 +331,10 @@ const rules = ref({
     <el-table
       :data="currentPageUserMsg"
       height="250"
-      stripe
       border
-      style="width: 100%; text-align: center"
+      style="width: 100%"
+      :header-cell-style="{ textAlign: 'center', color: '#515a6e', backgroundColor: '#f8f8f9' }"
+      :cell-style="{ textAlign: 'center' }"
       @selection-change="handleSelectionChange"
       table-layout="auto"
     >
@@ -318,9 +346,9 @@ const rules = ref({
       </el-table-column>
       <el-table-column prop="email" label="邮箱" width="200" />
       <el-table-column prop="phone" label="电话号码" width="180" />
-      <el-table-column prop="status" label="状态" width="200">
+      <el-table-column prop="status" label="状态" width="160">
         <template #default="scope">
-          <el-switch v-model="statusval" @click="handleStatus(scope)" />
+          <el-switch v-model="statusList[scope.$index]" @click="handleStatus(scope)" />
         </template>
       </el-table-column>
       <el-table-column prop="createDate" label="创建时间" width="200" />
@@ -350,35 +378,35 @@ const rules = ref({
   <!-- 新增用户的对话框 -->
   <el-dialog v-model="addFormVisible" title="新增用户" width="41%" destroy-on-close center>
     <el-form :inline="true" :rules="rules" ref="addFormRef" :model="formInline" class="demo-form-inline">
-      <el-form-item prop="account" label="用户名称">
+      <el-form-item prop="account" label="用户名称:">
         <el-input v-model="formInline.account" clearable />
       </el-form-item>
-      <el-form-item label="电话" style="margin-left: 10px">
+      <el-form-item label="电话:" style="margin-left: 10px">
         <el-input v-model="formInline.phone" clearable />
       </el-form-item>
-      <el-form-item prop="email" label="邮箱" style="margin-left: 37px">
+      <el-form-item prop="email" label="邮箱:" style="margin-left: 30px">
         <el-input v-model="formInline.email" clearable />
       </el-form-item>
-      <el-form-item prop="password" label="密码">
+      <el-form-item prop="password" label="密码:">
         <el-input type="password" v-model="formInline.password" clearable />
       </el-form-item>
-      <el-form-item label="性别:" style="margin-left: 35px">
+      <el-form-item label="性别:" style="margin-left: 40px">
         <div style="margin-left: 5px">男<input type="radio" name="sex" style="margin-left: 5px" value="男" v-model="formInline.gender" /></div>
         <div style="margin-left: 15px">女<input type="radio" name="sex" style="margin-left: 5px" value="女" v-model="formInline.gender" /></div>
       </el-form-item>
-      <el-form-item label="年龄" style="margin-left: 143px">
+      <el-form-item label="年龄:" style="margin-left: 148px">
         <el-input v-model="formInline.age" clearable />
       </el-form-item>
-      <el-form-item label="生日" style="width: 250px; margin-left: 36px">
+      <el-form-item label="生日:" style="width: 250px; margin-left: 42px">
         <el-date-picker v-model="formInline.birth" type="date" clearable />
       </el-form-item>
-      <el-form-item label="角色" style="margin-left: 21px">
+      <el-form-item label="角色:" style="margin-left: 23px">
         <!-- <el-input v-model="formInline.roleId" placeholder="请选择角色" clearable /> -->
         <el-select v-model="roleOptions.value" @change="handleRoleOPtion(roleOptions.value)">
           <el-option v-for="item in roleOptions" :key="item.id" :label="item.description" :value="item.description" />
         </el-select>
       </el-form-item>
-      <el-form-item label="状态:" style="margin-left: 32px">
+      <el-form-item label="状态:" style="margin-left: 42px">
         <div style="margin-left: 5px">正常<input type="radio" name="status" style="margin-left: 5px" value="正常" v-model="formInline.status" /></div>
         <div style="margin-left: 15px">
           停用<input type="radio" name="status" style="margin-left: 5px" value="停用" v-model="formInline.status" />
@@ -392,22 +420,22 @@ const rules = ref({
       </span>
     </template>
   </el-dialog>
-  <!-- 编辑用户的对话逻辑(到时候和新增封装为一个通用的Hook) -->
+  <!-- 编辑用户的对话逻辑(到时候和新增封装为一个通用的组件) -->
   <el-dialog v-model="editFormVisible" title="编辑用户信息" width="41%" destroy-on-close center>
     <el-form :inline="true" :rules="rules" :model="formInline" class="demo-form-inline">
-      <el-form-item prop="account" label="用户名称">
+      <el-form-item prop="account" label="用户名称:">
         <el-input v-model="formInline.account" clearable />
       </el-form-item>
-      <el-form-item label="电话" style="margin-right: 60px">
+      <el-form-item label="电话:" style="margin-left: 10px">
         <el-input v-model="formInline.phone" clearable />
       </el-form-item>
-      <el-form-item prop="email" label="邮箱" style="margin-left: 30px">
+      <el-form-item prop="email" label="邮箱:" style="margin-left: 30px">
         <el-input v-model="formInline.email" clearable />
       </el-form-item>
-      <el-form-item prop="password" label="密码" style="margin-right: 63px">
+      <el-form-item prop="password" label="密码:">
         <el-input type="password" disabled v-model="formInline.password" clearable />
       </el-form-item>
-      <el-form-item label="性别:" style="margin-left: 30px">
+      <el-form-item label="性别:" style="margin-left: 40px">
         <div style="margin-left: 5px">
           男<input :checked="formInline.gender === 1" type="radio" name="sex" style="margin-left: 5px" value="男" v-model="formInline.gender" />
         </div>
@@ -415,18 +443,18 @@ const rules = ref({
           女<input :checked="formInline.gender === 0" type="radio" name="sex" style="margin-left: 5px" value="女" v-model="formInline.gender" />
         </div>
       </el-form-item>
-      <el-form-item label="年龄" style="margin-left: 132px">
+      <el-form-item label="年龄:" style="margin-left: 148px">
         <el-input v-model="formInline.age" clearable />
       </el-form-item>
-      <el-form-item label="生日" style="width: 250px; margin-left: 32px">
+      <el-form-item label="生日:" style="width: 250px; margin-left: 42px">
         <el-date-picker v-model="formInline.birth" type="date" clearable />
       </el-form-item>
-      <el-form-item label="角色" style="margin-left: 7px">
+      <el-form-item label="角色:" style="margin-left: 23px">
         <el-select v-model="defaultRole" @change="handleRoleOPtion(roleOptions.value)">
           <el-option v-for="item in roleOptions" :key="item.id" :label="item.description" :value="item.description" />
         </el-select>
       </el-form-item>
-      <el-form-item label="状态:" style="margin-left: 32px">
+      <el-form-item label="状态:" style="margin-left: 42px">
         <div style="margin-left: 5px">
           正常<input
             type="radio"
