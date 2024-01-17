@@ -26,7 +26,7 @@ const getUserMsg = async ({ pageNum, pageSize }) => {
   userMsg.value.records.forEach((item) => {
     statusList.value.push(item.status === 1 ? true : false)
   })
-  console.log(statusList.value)
+  // console.log(statusList.value)
 }
 onMounted(() => {
   getUserMsg({
@@ -40,12 +40,12 @@ onMounted(() => {
 let IDs
 const handleSelectionChange = (val) => {
   IDs = ''
-  console.log(val)
+  // console.log(val)
   val.forEach((item) => {
     IDs += item.id + ','
   })
   IDs = IDs.slice(0, IDs.length - 1)
-  console.log(IDs)
+  // console.log(IDs)
 }
 
 //处理批量处理时的删除逻辑
@@ -81,7 +81,7 @@ let id = ref(-1)
 const handleDel = async (index, rowData) => {
   console.log('下标', index, '删除的数据', rowData.id)
   id.value = rowData.id
-  console.log('删除的id', id.value)
+  // console.log('删除的id', id.value)
   ElMessageBox.confirm('确认删除该用户吗?', {
     confirmButtonText: '是',
     cancelButtonText: '否',
@@ -104,12 +104,10 @@ const handleDel = async (index, rowData) => {
     .catch(() => {})
 }
 
-//用户状态(todo)
-// const rowStatus = ref(false)
-
+//处理用户状态
 const handleStatus = (scope) => {
-  console.log('111', scope)
-  console.log('scope.row.status: ', scope.row.status)
+  // console.log('111', scope)
+  // console.log('scope.row.status: ', scope.row.status)
   const changeStatus = ref('')
   const changedUserName = ref('')
   changedUserName.value = scope.row.account
@@ -125,14 +123,14 @@ const handleStatus = (scope) => {
   })
     .then(() => {
       statusList[scope.$index] = scope.row.status === 1 ? false : true
-      console.log('222', statusList[scope.$index])
+      // console.log('222', statusList[scope.$index])
 
       //后续调用相关api,修改用户的status
     })
     .catch(() => {
       statusList[scope.$index] = scope.row.status === 1 ? true : false
     })
-  console.log(scope)
+  // console.log(scope)
 }
 
 //查找用户
@@ -142,10 +140,10 @@ const searchData = ref({
   account: ''
 })
 const searchUser = async (val) => {
-  console.log('search', val)
+  // console.log('search', val)
   searchData.value.account = val
   const res = await searchUserInfoAPI(searchData.value)
-  console.log(res)
+  // console.log(res)
   //更新视图
   // const res1 = await getUserInfoAPI(0, 0)
   userMsg.value = res.data
@@ -283,7 +281,7 @@ const handledetail = (row) => {
 
 //确认修改用户信息
 const confirmEdit = async () => {
-  console.log('表单信息', formInline.value)
+  // console.log('表单信息', formInline.value)
   formInline.value.gender = formInline.value.gender === '男' ? 1 : 0
   formInline.value.status = formInline.value.status === '正常' ? 1 : 0
   await editUserInfoAPI(formInline.value)
@@ -292,7 +290,7 @@ const confirmEdit = async () => {
   const res1 = await getUserInfoAPI(0, 0)
   userMsg.value = res1.data
   currentPageUserMsg.value = userMsg.value.records.slice(0, searchForm.value.size)
-  console.log('editedData', res1)
+  // console.log('editedData', res1)
   ElMessage({
     type: 'success',
     message: '编辑用户信息成功'

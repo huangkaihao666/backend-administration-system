@@ -66,7 +66,7 @@ const confirm = () => {
           <el-icon v-if="isFold" size="30px"><Fold /></el-icon>
           <el-icon v-else size="30px"><Expand /></el-icon>
         </div>
-        91课堂后台管理系统
+        旅游后台管理系统
         <div class="topAvatar">
           <el-avatar class="avatar" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
           <el-dropdown>
@@ -109,7 +109,7 @@ const confirm = () => {
             <el-sub-menu index="/error">
               <template #title>
                 <el-icon><location /></el-icon>
-                <span>sb蔡植疯</span>
+                <span>蔡植疯好帅</span>
               </template>
               <el-menu-item index="/error">打倒卷王蔡植疯</el-menu-item>
             </el-sub-menu>
