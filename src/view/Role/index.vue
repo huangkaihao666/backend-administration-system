@@ -331,7 +331,7 @@ const confirmEdit = async () => {
       <!-- 表格结构 -->
       <el-table
         :data="currentPageUserMsg"
-        height="250"
+        height="400"
         border
         style="width: 100%; margin-top: 15px"
         :header-cell-style="{ textAlign: 'center', color: '#515a6e', backgroundColor: '#f8f8f9' }"

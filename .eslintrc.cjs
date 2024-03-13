@@ -67,7 +67,7 @@ module.exports = {
     'space-in-parens': 'warn', // 要求在圆括号内使用一致的空格
     'space-infix-ops': 'warn', // 要求操作符周围有空格
     'space-unary-ops': 'warn', // 要求在一元操作符前后使用一致的空格
-    parser: 'babel-eslint',
+    // parser: 'babel-eslint',
     // 'switch-colon-spacing': 'warn', // 要求在switch的冒号左右有空格
     // 'arrow-spacing': 'warn', // 要求箭头函数的箭头前后使用一致的空格
     // 'array-bracket-spacing': 'warn', // 要求数组方括号中使用一致的空格
