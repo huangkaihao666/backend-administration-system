@@ -8,7 +8,9 @@
 
 #### 安装教程
 
- git clone 
+1： git clone https://github.com/huangkaihao666/-.git
+2： npm install
+3:  npm run dev
 
 #### 使用说明
 
